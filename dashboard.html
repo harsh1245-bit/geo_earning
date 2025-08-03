@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geo Earnings Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { overflow-x: hidden; }
+    .filter-sidebar {
+      width: 20%;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 20px;
+      background-color: #f8f9fa;
+      border-right: 1px solid #ddd;
+    }
+    .dashboard-content {
+      width: 80%;
+      padding: 30px;
+    }
+    .filter-box {
+      background: #ffffff;
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      max-height: 33vh;
+      overflow-y: auto;
+    }
+    .main-container {
+      display: flex;
+      flex-direction: row;
+    }
+    .chart-container { margin-top: 30px; }
+  </style>
+</head>
+<body>
+<div class="main-container">
+  <div class="filter-sidebar">
+    <form method="get">
+      <div class="filter-box">
+        <label class="form-label">Align Code</label><br>
+<div class="form-check">
+  <input class="form-check-input" type="checkbox" id="select-all-align">
+  <label class="form-check-label" for="select-all-align"><strong>Select All</strong></label>
+</div>
+        {% for code in align_codes %}
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="align" value="{{ code }}" id="align-{{ code }}" {% if code in selected_align %}checked{% endif %}>
+          <label class="form-check-label" for="align-{{ code }}">{{ code }}</label>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="filter-box">
+        <label class="form-label">Geo Code</label><br>
+<div class="form-check">
+  <input class="form-check-input" type="checkbox" id="select-all-geo">
+  <label class="form-check-label" for="select-all-geo"><strong>Select All</strong></label>
+</div>
+        {% for geo in geo_codes %}
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="geo" value="{{ geo }}" id="geo-{{ geo }}" {% if geo in selected_geo %}checked{% endif %}>
+          <label class="form-check-label" for="geo-{{ geo }}">{{ geo }}</label>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="filter-box">
+        <label class="form-label">Employee</label><br>
+<div class="form-check">
+  <input class="form-check-input" type="checkbox" id="select-all-emp">
+  <label class="form-check-label" for="select-all-emp"><strong>Select All</strong></label>
+</div>
+        {% for emp in employee_names %}
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="employee" value="{{ emp }}" id="emp-{{ emp }}" {% if emp in selected_emp %}checked{% endif %}>
+          <label class="form-check-label" for="emp-{{ emp }}">{{ emp }}</label>
+        </div>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+    </form>
+  </div>
+
+  <div class="dashboard-content">
+    <h1 class="text-center mb-4">Geo Earnings Dashboard</h1>
+
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card text-bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Total Earnings</h5>
+            <p class="card-text fs-4">${{ total_earnings }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Average per Employee</h5>
+            <p class="card-text fs-4">${{ avg_earnings }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Unique Employees</h5>
+            <p class="card-text fs-4">{{ unique_employees }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <h4>Earnings by Geo Hierarchy</h4>
+      {{ geo_chart|safe }}
+    </div>
+
+    <div class="chart-container">
+      <h4>Earnings by Align Code</h4>
+      {{ align_chart|safe }}
+    </div>
+
+    <div class="chart-container">
+      <h4>Top 10 Employees by Earnings</h4>
+      {{ top_chart|safe }}
+    </div>
+
+    <div class="mt-4">
+      <a href="/download" class="btn btn-success">Download CSV</a>
+    </div>
+  </div>
+</div>
+<script>
+  // Select All Checkboxes
+  document.addEventListener("DOMContentLoaded", function() {
+    const toggleSelectAll = (masterId, groupName) => {
+      const master = document.getElementById(masterId);
+      master?.addEventListener("change", () => {
+        document.querySelectorAll(`input[name='${groupName}']`).forEach(cb => cb.checked = master.checked);
+      });
+    };
+    toggleSelectAll("select-all-align", "align");
+    toggleSelectAll("select-all-geo", "geo");
+    toggleSelectAll("select-all-emp", "employee");
+  });
+</script>
+</body>
+</html>
